@@ -67,8 +67,34 @@ class Recorder {
     }
   }
 
+  // TODO: RecordedSampleクラスみたいなやつを作ってそっちの振る舞いにする
+  private changeSampleRate(samples: Float32Array, fromRate: number, toRate: number) {
+    const rate = fromRate / toRate;
+    const result = new Float32Array(Math.round(samples.length / rate));
+
+    console.log(samples.length, result.length);
+    let offsetSamples = 0;
+    result.forEach((_, offsetResult) => {
+      const nextOffsetSamples = Math.round((offsetResult + 1) * rate);
+
+      let accum = 0;
+      let count = 0;
+      for (let i = offsetSamples; i < nextOffsetSamples && i < samples.length; i++) {
+        accum += samples[i];
+        count++;
+      }
+
+      offsetSamples = nextOffsetSamples;
+      result[offsetResult] = accum / count;
+    });
+
+    return result;
+  }
+
   public generateRecordedWave() {
-    const samples = this.recordedSamples;
+    // TODO: 別途定数として扱うようにする
+    const sampleRateForEmpath = 11025;
+    const samples = this.changeSampleRate(this.recordedSamples, this.sampleRate, sampleRateForEmpath);
     const dataView = new DataView(new ArrayBuffer(44 + samples.length * 2));
 
     this.writeToDataView(dataView, 0, 'RIFF'); // RIFFヘッダー
@@ -78,8 +104,8 @@ class Recorder {
     dataView.setUint32(16, 16, true); // fmtチャンクのバイト数
     dataView.setUint16(20, 1, true); // フォーマットID
     dataView.setUint16(22, 1, true); // チャンネル数
-    dataView.setUint32(24, this.sampleRate, true); // サンプリング周波数
-    dataView.setUint32(28, this.sampleRate * 2, true); // データ速度
+    dataView.setUint32(24, sampleRateForEmpath, true); // サンプリング周波数
+    dataView.setUint32(28, sampleRateForEmpath * 2, true); // データ速度
     dataView.setUint16(32, 2, true); // ブロックサイズ
     dataView.setUint16(34, 16, true); // サンプルあたりのビット数
     this.writeToDataView(dataView, 36, 'data'); // dataチャンク
