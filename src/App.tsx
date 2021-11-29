@@ -1,3 +1,4 @@
+import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import './App.css'
 
@@ -123,6 +124,23 @@ const createRecorder = async () => {
   return new Recorder(stream, context);
 }
 
+const requestAnalyzeWav = async (wav: Blob) => {
+  const url = 'https://api.webempath.net/v2/analyzeWav';
+  try {
+    const body = new FormData();
+    body.append('apikey', process.env.EMPATH_API_KEY);
+    body.append('wav', wav);
+
+    const { data } = await axios.post(
+      url,
+      body,
+    );
+    return data;
+  } catch (e) {
+    console.error(e);
+  }
+}
+
 function App() {
   // const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
   const [isInRecording, setIsInRecording] = useState(false);
@@ -134,7 +152,7 @@ function App() {
       .then((recorder) => { setRecorder(recorder); })
       .catch((e) => { console.error(e) });
   }, []);
-
+  
   const clickHandler = () => {
     if (!recorder) return;
 
@@ -143,6 +161,7 @@ function App() {
       const wav = recorder.generateRecordedWave();
       const blob = new Blob([wav], { type: 'audio/wav' });
       const url = window.URL.createObjectURL(blob);
+      requestAnalyzeWav(blob).then((res) => { console.log('analyze wav results', res) });
       setRecordedSound(url);
     } else {
       recorder.start();
