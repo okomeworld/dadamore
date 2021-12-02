@@ -1,3 +1,5 @@
+import { Circle, Mic } from '@mui/icons-material';
+import { AppBar, Button, Container, Stack, Toolbar, Typography } from '@mui/material';
 import axios from 'axios';
 import { useCallback, useEffect, useState } from 'react';
 import './App.css'
@@ -142,7 +144,6 @@ const requestAnalyzeWav = async (wav: Blob) => {
 }
 
 function App() {
-  // const [mediaRecorder, setMediaRecorder] = useState<MediaRecorder>();
   const [isInRecording, setIsInRecording] = useState(false);
   const [recordedSound, setRecordedSound] = useState<string>();
   const [recorder, setRecorder] = useState<Recorder>()
@@ -171,18 +172,23 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          <button type="button" disabled={!recorder} onClick={clickHandler}>
-            {isInRecording ? '停止' : '録音'}
-          </button>
-        </p>
-        <p>
-          <audio controls src={recordedSound}></audio>
-        </p>
-      </header>
-    </div>
+    <>
+      <AppBar position="static">
+        <Toolbar>
+          <Container maxWidth="sm">
+            <Stack justifyContent="center" alignItems="center">
+              <Typography>だだもれ ver β</Typography>
+            </Stack>
+          </Container>
+        </Toolbar>
+      </AppBar>
+      <Container maxWidth="sm">
+        <Stack mt={8} spacing={4} justifyContent="center" alignItems="center">
+          <Mic sx={{ fontSize: 240, filter: "drop-shadow(0px 0px 5px white)" }} />
+          <Button variant="contained" size="large" startIcon={<Circle sx={{ color: "#d32f2f" }} />}>録音</Button>
+        </Stack>
+      </Container>
+    </>
   )
 }
 
