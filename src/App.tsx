@@ -1,27 +1,31 @@
-import { Circle, Mic } from '@mui/icons-material';
-import { AppBar, Button, Container, Stack, Toolbar, Typography } from '@mui/material';
-import axios from 'axios';
-import { useCallback, useEffect, useState } from 'react';
-import './App.css'
+import { Circle, Mic } from "@mui/icons-material";
+import {
+  AppBar,
+  Button,
+  Container,
+  Stack,
+  Toolbar,
+  Typography,
+} from "@mui/material";
+import axios from "axios";
+import { useCallback, useEffect, useState } from "react";
+import "./App.css";
 
 class Recorder {
   private source: MediaStreamAudioSourceNode;
   private recorder: ScriptProcessorNode;
-  private _isInRecording: boolean = false;
+  private _isInRecording = false;
   private buffers: Float32Array[] = [];
 
-  constructor(
-    stream: MediaStream,
-    private context: AudioContext,
-  ) {
+  constructor(stream: MediaStream, private context: AudioContext) {
     this.source = context.createMediaStreamSource(stream);
     this.recorder = context.createScriptProcessor(4096, 1, 1);
 
-    this.recorder.addEventListener('audioprocess', (event) => {
+    this.recorder.addEventListener("audioprocess", (event) => {
       const input = event.inputBuffer.getChannelData(0);
       const buffer = new Float32Array(input);
       this.buffers.push(buffer);
-    })
+    });
   }
 
   public start() {
@@ -46,7 +50,10 @@ class Recorder {
   }
 
   public get recordedSamples() {
-    const buffersAllLength = this.buffers.reduce((sum, currentBuffer) => sum + currentBuffer.length, 0);
+    const buffersAllLength = this.buffers.reduce(
+      (sum, currentBuffer) => sum + currentBuffer.length,
+      0
+    );
     const samples = new Float32Array(buffersAllLength);
     let offset = 0;
     this.buffers.forEach((buffer) => {
@@ -62,16 +69,24 @@ class Recorder {
     }
   }
 
-  private floatTo16bitPCM(output: DataView, offset: number, input: Float32Array) {
+  private floatTo16bitPCM(
+    output: DataView,
+    offset: number,
+    input: Float32Array
+  ) {
     for (let i = 0; i < input.length; i++) {
       const s = Math.max(-1, Math.min(1, input[i]));
-      output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      output.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7fff, true);
       offset += 2;
     }
   }
 
   // TODO: RecordedSampleクラスみたいなやつを作ってそっちの振る舞いにする
-  private changeSampleRate(samples: Float32Array, fromRate: number, toRate: number) {
+  private changeSampleRate(
+    samples: Float32Array,
+    fromRate: number,
+    toRate: number
+  ) {
     const rate = fromRate / toRate;
     const result = new Float32Array(Math.round(samples.length / rate));
 
@@ -82,7 +97,11 @@ class Recorder {
 
       let accum = 0;
       let count = 0;
-      for (let i = offsetSamples; i < nextOffsetSamples && i < samples.length; i++) {
+      for (
+        let i = offsetSamples;
+        i < nextOffsetSamples && i < samples.length;
+        i++
+      ) {
         accum += samples[i];
         count++;
       }
@@ -97,13 +116,17 @@ class Recorder {
   public generateRecordedWave() {
     // TODO: 別途定数として扱うようにする
     const sampleRateForEmpath = 11025;
-    const samples = this.changeSampleRate(this.recordedSamples, this.sampleRate, sampleRateForEmpath);
+    const samples = this.changeSampleRate(
+      this.recordedSamples,
+      this.sampleRate,
+      sampleRateForEmpath
+    );
     const dataView = new DataView(new ArrayBuffer(44 + samples.length * 2));
 
-    this.writeToDataView(dataView, 0, 'RIFF'); // RIFFヘッダー
+    this.writeToDataView(dataView, 0, "RIFF"); // RIFFヘッダー
     dataView.setUint32(4, 32 + samples.length * 2, true); // ファイルサイズ
-    this.writeToDataView(dataView, 8, 'WAVE'); // WAVEヘッダー
-    this.writeToDataView(dataView, 12, 'fmt '); // fmtチャンク
+    this.writeToDataView(dataView, 8, "WAVE"); // WAVEヘッダー
+    this.writeToDataView(dataView, 12, "fmt "); // fmtチャンク
     dataView.setUint32(16, 16, true); // fmtチャンクのバイト数
     dataView.setUint16(20, 1, true); // フォーマットID
     dataView.setUint16(22, 1, true); // チャンネル数
@@ -111,8 +134,8 @@ class Recorder {
     dataView.setUint32(28, sampleRateForEmpath * 2, true); // データ速度
     dataView.setUint16(32, 2, true); // ブロックサイズ
     dataView.setUint16(34, 16, true); // サンプルあたりのビット数
-    this.writeToDataView(dataView, 36, 'data'); // dataチャンク
-    dataView.setUint32(40, samples.length * 2, true) // 波形データのバイト数
+    this.writeToDataView(dataView, 36, "data"); // dataチャンク
+    dataView.setUint32(40, samples.length * 2, true); // 波形データのバイト数
     this.floatTo16bitPCM(dataView, 44, samples); // 波形データ
 
     return dataView;
@@ -120,49 +143,53 @@ class Recorder {
 }
 
 const createRecorder = async () => {
-  const stream = await window.navigator.mediaDevices.getUserMedia({ audio: true });
+  const stream = await window.navigator.mediaDevices.getUserMedia({
+    audio: true,
+  });
   const context = new AudioContext();
 
   return new Recorder(stream, context);
-}
+};
 
 const requestAnalyzeWav = async (wav: Blob) => {
-  const url = 'https://api.webempath.net/v2/analyzeWav';
+  const url = "https://api.webempath.net/v2/analyzeWav";
   try {
     const body = new FormData();
-    body.append('apikey', process.env.EMPATH_API_KEY);
-    body.append('wav', wav);
+    body.append("apikey", process.env.EMPATH_API_KEY);
+    body.append("wav", wav);
 
-    const { data } = await axios.post(
-      url,
-      body,
-    );
+    const { data } = await axios.post(url, body);
     return data;
   } catch (e) {
     console.error(e);
   }
-}
+};
 
 function App() {
   const [isInRecording, setIsInRecording] = useState(false);
   const [recordedSound, setRecordedSound] = useState<string>();
-  const [recorder, setRecorder] = useState<Recorder>()
+  const [recorder, setRecorder] = useState<Recorder>();
 
   useEffect(() => {
     createRecorder()
-      .then((recorder) => { setRecorder(recorder); })
-      .catch((e) => { console.error(e) });
+      .then((recorder) => {
+        setRecorder(recorder);
+      })
+      .catch((e) => {
+        console.error(e);
+      });
   }, []);
-  
   const clickHandler = () => {
     if (!recorder) return;
 
     if (recorder.isInRecording) {
       recorder.stop();
       const wav = recorder.generateRecordedWave();
-      const blob = new Blob([wav], { type: 'audio/wav' });
+      const blob = new Blob([wav], { type: "audio/wav" });
       const url = window.URL.createObjectURL(blob);
-      requestAnalyzeWav(blob).then((res) => { console.log('analyze wav results', res) });
+      requestAnalyzeWav(blob).then((res) => {
+        console.log("analyze wav results", res);
+      });
       setRecordedSound(url);
     } else {
       recorder.start();
@@ -184,12 +211,20 @@ function App() {
       </AppBar>
       <Container maxWidth="sm">
         <Stack mt={8} spacing={4} justifyContent="center" alignItems="center">
-          <Mic sx={{ fontSize: 240, filter: "drop-shadow(0px 0px 5px white)" }} />
-          <Button variant="contained" size="large" startIcon={<Circle sx={{ color: "#d32f2f" }} />}>録音</Button>
+          <Mic
+            sx={{ fontSize: 240, filter: "drop-shadow(0px 0px 5px white)" }}
+          />
+          <Button
+            variant="contained"
+            size="large"
+            startIcon={<Circle sx={{ color: "#d32f2f" }} />}
+          >
+            録音
+          </Button>
         </Stack>
       </Container>
     </>
-  )
+  );
 }
 
-export default App
+export default App;

@@ -1,29 +1,28 @@
-import React from 'react'
-import ReactDOM from 'react-dom'
-import App from './App'
-import { createTheme, CssBaseline, ThemeProvider } from '@mui/material'
+import React from "react";
+import ReactDOM from "react-dom";
+import App from "./App";
+import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 
 const defaultTheme = createTheme();
 
 const theme = createTheme({
   palette: {
     primary: {
-      main: '#06172b',
+      main: "#06172b",
     },
     secondary: {
-      main: '#bbafbb',
+      main: "#bbafbb",
     },
     background: {
-      default: '#324051',
-      paper: '#626d7a',
+      default: "#324051",
+      paper: "#626d7a",
     },
   },
   typography: {
-    fontFamily: [
-      '"Noto Sans JP"',
-      defaultTheme.typography.fontFamily
-    ].join(', '),
-  }
+    fontFamily: ['"Noto Sans JP"', defaultTheme.typography.fontFamily].join(
+      ", "
+    ),
+  },
 });
 console.log(theme);
 
@@ -34,5 +33,5 @@ ReactDOM.render(
       <App />
     </ThemeProvider>
   </React.StrictMode>,
-  document.getElementById('root')
-)
+  document.getElementById("root")
+);
