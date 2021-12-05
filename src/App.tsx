@@ -8,6 +8,7 @@ import {
   useRecordedResult,
   useRecorderControlState,
 } from "./features/Recorder";
+import { Analyzer } from "./features/Analyzer";
 
 const requestAnalyzeWav = async (wav: Blob) => {
   const url = "https://api.webempath.net/v2/analyzeWav";
@@ -61,6 +62,7 @@ function App() {
           <RecordingToggleButton />
         </Stack>
       </Container>
+      <Analyzer />
     </>
   );
 }
