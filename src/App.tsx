@@ -29,15 +29,10 @@ function App() {
   const [recorderState, setRecorderState] = useRecorderControlState();
   const [recordedSound, setRecordedSound] = useState<string>();
 
+  const [recordedWav, setRecordedWav] = useState<DataView | null>(null);
   useEffect(() => {
-    console.log(recorderState);
     if (recorderState === "STOP" && result) {
-      const blob = new Blob([result], { type: "audio/wav" });
-      const url = window.URL.createObjectURL(blob);
-      requestAnalyzeWav(blob).then((res) => {
-        console.log("analyze wav results", res);
-      });
-      setRecordedSound(url);
+      setRecordedWav(result);
       setRecorderState("READY");
     }
   }, [recorderState]);
@@ -58,11 +53,10 @@ function App() {
           <Mic
             sx={{ fontSize: 240, filter: "drop-shadow(0px 0px 5px white)" }}
           />
-          <audio controls src={recordedSound} />
           <RecordingToggleButton />
         </Stack>
       </Container>
-      <Analyzer />
+      <Analyzer recordedWav={recordedWav} />
     </>
   );
 }
