@@ -1,8 +1,5 @@
 import { Mic } from "@mui/icons-material";
 import { AppBar, Container, Stack, Toolbar, Typography } from "@mui/material";
-import { useEffect, useState } from "react";
-import axios from "axios";
-import "./App.css";
 import { RecordingToggleButton, useRecordedWav } from "./features/Recorder";
 import { Analyzer } from "./features/Analyzer";
 
