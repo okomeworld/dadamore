@@ -4,9 +4,12 @@ export class Recorder {
   private _isInRecording = false;
   private buffers: Float32Array[] = [];
 
+  public readonly analyser: AnalyserNode;
+
   constructor(stream: MediaStream, private context: AudioContext) {
     this.source = context.createMediaStreamSource(stream);
     this.recorder = context.createScriptProcessor(4096, 1, 1);
+    this.analyser = context.createAnalyser();
 
     this.recorder.addEventListener("audioprocess", (event) => {
       const input = event.inputBuffer.getChannelData(0);
@@ -18,6 +21,7 @@ export class Recorder {
   public start() {
     this.buffers = [];
     this.source.connect(this.recorder);
+    this.source.connect(this.analyser);
     this.recorder.connect(this.context.destination);
     this._isInRecording = true;
   }
@@ -25,6 +29,7 @@ export class Recorder {
   public stop() {
     this.recorder.disconnect(this.context.destination);
     this.source.disconnect(this.recorder);
+    this.source.disconnect(this.analyser);
     this._isInRecording = false;
   }
 
