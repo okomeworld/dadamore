@@ -25,7 +25,6 @@ const theme = createTheme({
     ),
   },
 });
-console.log(theme);
 
 ReactDOM.render(
   <React.StrictMode>

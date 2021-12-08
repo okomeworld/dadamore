@@ -82,7 +82,6 @@ export class Recorder {
     const rate = fromRate / toRate;
     const result = new Float32Array(Math.round(samples.length / rate));
 
-    console.log(samples.length, result.length);
     let offsetSamples = 0;
     result.forEach((_, offsetResult) => {
       const nextOffsetSamples = Math.round((offsetResult + 1) * rate);
