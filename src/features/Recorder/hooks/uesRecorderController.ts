@@ -8,7 +8,9 @@ export const useRecorderController = () => {
   const recorder = useRecorderInstance();
   const setControlState = useSetRecoilState(recorderControlState);
   const setRecordedWavState = useSetRecoilState(recordedWavState);
-  const [timeoutId, setTimeoutId] = useState<number | undefined>();
+  const [timeoutId, setTimeoutId] = useState<
+    ReturnType<typeof setTimeout> | undefined
+  >();
 
   const startRecording = () => {
     if (!recorder) return;
@@ -24,7 +26,9 @@ export const useRecorderController = () => {
   const stopRecording = () => {
     if (!recorder) return;
     recorder.stop();
-    clearTimeout(timeoutId);
+    if (timeoutId) {
+      clearTimeout(timeoutId);
+    }
     setControlState("STOP");
     setRecordedWavState(recorder.generateRecordedWave());
     setControlState("READY"); // TODO: いらないかもしれないので後で確認する
