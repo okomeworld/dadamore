@@ -24,7 +24,7 @@ function App() {
         <Toolbar>
           <Container maxWidth="sm">
             <Stack justifyContent="center" alignItems="center">
-              <Typography>だだもれ ver β</Typography>
+              <Typography>DADAMORE</Typography>
             </Stack>
           </Container>
         </Toolbar>
