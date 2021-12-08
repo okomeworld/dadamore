@@ -1,10 +1,22 @@
-import { Mic } from "@mui/icons-material";
+import { useMemo } from "react";
 import { AppBar, Container, Stack, Toolbar, Typography } from "@mui/material";
-import { RecordingToggleButton, useRecordedWav } from "./features/Recorder";
+import {
+  RecordingToggleButton,
+  useAnalyser,
+  useRecordedWav,
+  useRecorderControlState,
+} from "./features/Recorder";
 import { Analyzer } from "./features/Analyzer";
+import { Visualizer } from "./features/Visualizer";
 
 function App() {
+  const [recorderState] = useRecorderControlState();
   const recordedWav = useRecordedWav();
+  const analyser = useAnalyser();
+
+  const isVisualizerEnabled = useMemo(() => {
+    return recorderState === "IN_RECORDING";
+  }, [recorderState]);
 
   return (
     <>
@@ -19,9 +31,7 @@ function App() {
       </AppBar>
       <Container maxWidth="sm">
         <Stack mt={8} spacing={4} justifyContent="center" alignItems="center">
-          <Mic
-            sx={{ fontSize: 240, filter: "drop-shadow(0px 0px 5px white)" }}
-          />
+          <Visualizer enabled={isVisualizerEnabled} analyser={analyser} />
           <RecordingToggleButton />
         </Stack>
       </Container>
