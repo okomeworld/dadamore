@@ -1,14 +1,8 @@
-import { atom, selector } from "recoil";
-import { createRecorder } from "../utils/createRecorder";
+import { atom } from "recoil";
+import { Recorder } from "../utils/Recorder";
 
-export const recorderState = atom({
+export const recorderState = atom<Recorder | null>({
   key: "recorderState",
-  default: selector({
-    key: "createRecorder",
-    async get() {
-      return await createRecorder();
-    },
-    dangerouslyAllowMutability: true,
-  }),
+  default: null,
   dangerouslyAllowMutability: true,
 });

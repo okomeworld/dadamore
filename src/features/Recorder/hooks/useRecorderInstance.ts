@@ -1,8 +1,6 @@
-import { useRecoilValueLoadable } from "recoil";
+import { useRecoilState } from "recoil";
 import { recorderState } from "../store/RecorderState";
 
 export const useRecorderInstance = () => {
-  const loadable = useRecoilValueLoadable(recorderState);
-
-  return loadable.state === "hasValue" ? loadable.contents : null;
+  return useRecoilState(recorderState);
 };
