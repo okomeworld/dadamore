@@ -29,8 +29,8 @@ export const useAnalyzerDialogViewModel = (
           },
         });
       })
-      .catch(() => {
-        setViewModel({ status: "ERROR" });
+      .catch((e: Error) => {
+        setViewModel({ status: "ERROR", message: e.message });
       });
   }, [wav]);
 

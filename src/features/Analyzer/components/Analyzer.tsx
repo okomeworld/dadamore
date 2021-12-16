@@ -14,6 +14,7 @@ interface ErrorAnalyzerProps {
 
 interface LoadingAnalyzerProps {
   status: "ERROR";
+  message: string;
 }
 
 export type AnalyzerDialogViewModel =
@@ -36,7 +37,7 @@ export const Analyzer = ({
     return <SucceededDialog {...props.dialogProps} />;
   }
   if (props.status === "ERROR") {
-    return <ErrorDialog />;
+    return <ErrorDialog>{props.message}</ErrorDialog>;
   }
   if (props.status === "LOADING") {
     return <LoadingDialog />;

@@ -12,7 +12,11 @@ import {
   Typography,
 } from "@mui/material";
 
-export const ErrorDialog = (): JSX.Element => {
+export const ErrorDialog = ({
+  children,
+}: {
+  children?: string;
+}): JSX.Element => {
   const [open, setOpen] = useState(true);
 
   return (
@@ -28,6 +32,7 @@ export const ErrorDialog = (): JSX.Element => {
         <DialogContentText>
           何らかの不具合で分析できませんでした。ごめんね！
         </DialogContentText>
+        {children && <DialogContentText>{children}</DialogContentText>}
       </DialogContent>
       <DialogActions sx={{ justifyContent: "center" }}>
         <Box>
