@@ -1,9 +1,12 @@
 import { useState } from "react";
 import {
   AppBar,
+  Box,
   Button,
   Dialog,
+  DialogActions,
   DialogContent,
+  DialogContentText,
   Stack,
   Toolbar,
   Typography,
@@ -22,10 +25,12 @@ export const ErrorDialog = (): JSX.Element => {
         </Toolbar>
       </AppBar>
       <DialogContent>
-        <Stack>
-          <Typography>
-            何らかの不具合で分析できませんでした。ごめんね！
-          </Typography>
+        <DialogContentText>
+          何らかの不具合で分析できませんでした。ごめんね！
+        </DialogContentText>
+      </DialogContent>
+      <DialogActions sx={{ justifyContent: "center" }}>
+        <Box>
           <Button
             variant="contained"
             size="large"
@@ -33,8 +38,8 @@ export const ErrorDialog = (): JSX.Element => {
           >
             閉じる
           </Button>
-        </Stack>
-      </DialogContent>
+        </Box>
+      </DialogActions>
     </Dialog>
   );
 };
