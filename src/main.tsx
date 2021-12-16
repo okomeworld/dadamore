@@ -4,6 +4,12 @@ import App from "./App";
 import { createTheme, CssBaseline, ThemeProvider } from "@mui/material";
 import { RecoilRoot } from "recoil";
 
+if (import.meta.env.DEV) {
+  import("./mocks/browser").then(({ worker }) => {
+    worker.start();
+  });
+}
+
 const defaultTheme = createTheme();
 
 const theme = createTheme({
