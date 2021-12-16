@@ -1,14 +1,19 @@
-import { useState } from "react";
+import React, { ReactElement, useMemo, useState } from "react";
 import {
   AppBar,
   Box,
   Button,
   Dialog,
   DialogContent,
+  DialogProps,
+  Slide,
   Stack,
   Toolbar,
   Typography,
+  useMediaQuery,
 } from "@mui/material";
+import { Theme } from "@mui/system";
+import { TransitionProps } from "@mui/material/transitions";
 import {
   PolarAngleAxis,
   PolarGrid,
@@ -36,14 +41,38 @@ export interface SucceededDialogProps {
   wavUrl: string;
 }
 
+const Transition = React.forwardRef(
+  (props: TransitionProps & { children: ReactElement }, ref) => {
+    return <Slide direction="up" ref={ref} {...props} />;
+  }
+);
+Transition.displayName = "Transition";
+
 export const SucceededDialog = ({
   results,
   wavUrl,
 }: SucceededDialogProps): JSX.Element => {
+  const inMobile = useMediaQuery<Theme>((theme) =>
+    theme.breakpoints.down("sm")
+  );
   const [open, setOpen] = useState(true);
 
+  const dialogProps = useMemo(() => {
+    const props: DialogProps = {
+      open,
+      fullWidth: !inMobile,
+      fullScreen: inMobile,
+    };
+
+    if (inMobile) {
+      props.TransitionComponent = Transition;
+    }
+
+    return props;
+  }, [open, inMobile]);
+
   return (
-    <Dialog open={open} fullWidth>
+    <Dialog {...dialogProps}>
       <AppBar position="relative">
         <Toolbar>
           <Stack width="100%" justifyContent="center" alignItems="center">
@@ -60,7 +89,11 @@ export const SucceededDialog = ({
             <ResponsiveContainer width="100%" height="100%">
               <RadarChart cx="50%" cy="50%" outerRadius="80%" data={results}>
                 <PolarGrid />
-                <PolarAngleAxis dataKey="subject" tick={{ fill: "white" }} />
+                <PolarAngleAxis
+                  dataKey="subject"
+                  tick={{ fill: "white" }}
+                  orient="inner"
+                />
                 <PolarRadiusAxis domain={[0, 50]} />
                 <Radar
                   name="分析結果"
