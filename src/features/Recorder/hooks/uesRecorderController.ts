@@ -1,12 +1,14 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useSetRecoilState } from "recoil";
 import { recordedWavState } from "../store/RecordedWavState";
 import { recorderControlState } from "../store/RecorderControlState";
 import { createRecorder } from "../utils/createRecorder";
+import { Recorder } from "../utils/Recorder";
 import { useRecorderInstance } from "./useRecorderInstance";
 
 export const useRecorderController = () => {
   const [recorderInstance, setRecorderInstance] = useRecorderInstance();
+  const recorderRef = useRef<Recorder>();
   const setControlState = useSetRecoilState(recorderControlState);
   const setRecordedWavState = useSetRecoilState(recordedWavState);
   const [timeoutId, setTimeoutId] = useState<
@@ -21,18 +23,20 @@ export const useRecorderController = () => {
         stopRecording();
       }, 4500)
     );
+    recorderRef.current = recorder;
     setRecorderInstance(recorder);
     setControlState("IN_RECORDING");
   };
 
   const stopRecording = () => {
-    if (!recorderInstance) return;
-    recorderInstance.stop();
+    const { current: recorder } = recorderRef;
+    if (!recorder) return;
+    recorder.stop();
     if (timeoutId) {
       clearTimeout(timeoutId);
     }
     setControlState("STOP");
-    setRecordedWavState(recorderInstance.generateRecordedWave());
+    setRecordedWavState(recorder.generateRecordedWave());
     setRecorderInstance(null);
     setControlState("READY"); // TODO: いらないかもしれないので後で確認する
   };
