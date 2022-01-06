@@ -24,6 +24,8 @@ https://webempath.net/sign_in
 echo "VITE_EMPATH_API_KEY=${YOUR_EMPATH_API_KEY}" > .env.local
 ```
 
+※ `${YOUR_EMPTH_API_KEY}` の部分を用意したAPI Keyに置き換えてください
+
 ### Step 3
 
 下記コマンドで起動する
