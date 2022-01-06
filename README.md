@@ -18,10 +18,10 @@ https://webempath.net/sign_in
 
 ### Step 2
 
-リポジトリ直下に `.env` ファイルを作成し、下記のように用意したEmpathのAPI Keyを設定する
+リポジトリ直下に `.env.local` ファイルを作成し、下記のように用意したEmpathのAPI Keyを設定する
 
 ```bash
-echo "VITE_EMPATH_API_KEY=${YOUR_EMPATH_API_KEY}" > .env
+echo "VITE_EMPATH_API_KEY=${YOUR_EMPATH_API_KEY}" > .env.local
 ```
 
 ### Step 3
