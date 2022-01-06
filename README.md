@@ -30,5 +30,10 @@ echo "VITE_EMPATH_API_KEY=${YOUR_EMPATH_API_KEY}" > .env.local
 
 ```bash
 npm install
-npm run dev
+npm run build
+npm run serve
 ```
+
+#### 開発モード
+
+`npm run dev` で起動するとAPIリクエストをモックし、ランダムな分析結果を返すようになります
